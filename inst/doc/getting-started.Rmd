@@ -1,0 +1,73 @@
+---
+title: "callback: getting started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+We will use the `callback` package to analyze hiring discrimination based on gender and origin in France. The experiment was conducted in 2009 for the jobs of software developers (Petit et al., 2013). The data is available in the data frame `inter1`. Let's examine its contents.
+```{r setup}
+library(callback)
+data(inter1)
+str(inter1)
+```
+The first variable `offer` is very important. It indicates the job offer identification. It is important because, in order to test discrimination, the workers must candidate on the same job offer. This is the `cluster` parameter of the `callback()` function. With `cluster="offer"` we are sure that all the computations will be paired, which means that we will always compare the candidates on the very same job offer. This is essential to produce meaningful results since otherwise the difference of answers could come from the differences of recruiters and not from the differences in gender or origin.
+
+The second important variables are the one that define the candidates. Here, there are two variables : gender and origin. These are factors and the reference levels of these factors define a reference candidate. Which one? By convention, it is the candidate that is the least susceptible of being discriminated against. Here, the reference candidate would be male because male candidates should not be discriminated against because of their gender, and from a French origin because French origin candidates should not be discriminated against in the French labour market because they have a French origin. In practice, we wil check that this candidate really had the highest callback rate. We can find the reference levels of our two factors by looking at the first level given by the `levels()` function.
+```{r}
+levels(inter1$gender)
+levels(inter1$origin)
+```
+
+There are two genders : "Man" (reference) and "Woman". There are four origins : French (F, reference), Moroccan (M), Senegalese (S) and Vietnamese (V). You do not need to aggregate the two candidates' variables gender and origin to use `callback()`, it will do it for you. 
+
+The last element we need is, obviously, the outcome of the job hiring application. It is given by the `callback` variable. It is a Boolean variable, TRUE when the recruiter gives a non negative callback, and FALSE otherwise.
+
+We can know launch the `callback()` function, which prepares the data for statistical analysis. Here we need to choose the `comp` parameter. Indeed, we realize that there are 8 candidates so that $8\times 7/2=28$ possible comparisons are possible. This is a large number and this is why `callback()` performs the statistical analysis according to the reference candidate by default with `comp="ref"`.  This reduces our analysis to 7 comparisons.  You can get the 28 comparisons by choosing `comp="all"` instead. 
+```{r}
+m <- callback(data = inter1, cluster = "offer", candid = c("gender","origin"), callback = "callback")
+```
+The m object contains for formatted data needed for the analysis. Using 'print()' gives the mains characteristics of the experiment :
+```{r}
+print(m)
+```
+We find that the experiment is standard, in the sense that all the candidates were sent to all the applications. Notice that this is not needed to use `callback`. 
+
+In order to get the result of the discrimination tests, we will use the 'stat_count' function. It can be saved into an object for further exports, or printed. The following instruction:
+```{r}
+s <- stat_count(m)
+```
+does not produce any printed output, by saves an object `stat_count` into `s`. We can get the statistics with:
+```{r}
+print(s)
+```
+
+The callback counts describe the results of the paired experiments. The first column defines the comparison under the form "candidate 1 vs candidate 2". Here "Man.F vs Woman.F" means that we compare French origin men and women. Out of $310$ tests, $113$ got at least one callback. The men got $86$ callbacks and the women $70$. The difference, called net discrimination, equals $16$ callbacks. We can go further in the details thanks to the next block. Out of $310$ tests, neither candidate was called back in $197$ of the job offers, $43$ called only men, $27$ called only women and $43$ called both. Discrimination only occurs when a single candidate is called back. The net discrimination is thus $43-27=16$.
+
+Now, we can pass to the proportions analysis. We can save hte output or print it, like in the previous example. Printing is the default. There are two ways to compute proportions in discrimination studies. First, you can divide the number of callbacks by the number of tests. Second, you can restrict your analysis to the tests where only one candidate has been called back, and give his share of the callbacks. We start with the first convention.
+```{r}
+stat_prop(m)
+```
+
+
+The overall callback rate measures the tension in the labour market: the more firms need workers, the higher it is. For software developers, we are above $30\%$, which is a high callback rate. The next block give the callback rates of pairs of candidates with their confidence interval at the $95\%$ level (you can change it with the option "level"). French origin men were called back in $27.7\%$ of the 310 applications ($95\%$ interval: $22.8\%-33.1\%$), while French origin women were called back for $22.6\%$ of the tests ($95\%$ interval : $18.1\%-27.6\%$).
+
+Let's apply the second convention. Out of the 310 tests, 113 were discriminatory (only one of the two candidates had a callback). French origin men got $61,4\%$ of these callbacks and the French origin women $1-61,4\%=38,6\%$. The confidence intervals are also provided.
+
+We may then wonder: are these differences statistically significant? We enter:
+```{r}
+stat_comp(m)
+```
+
+
+Considering the first convention, we give the Student test of proportions equality. In our example, we compare $27.7\%$ with $22.6\%$. The Student statistic is $1.92$ and its p-value is $5.6\%$ so that the difference is not significant at the $5\%$ level. There would be no significant discrimination between the French origin candidates. However, a rapid look at the other p-values reveals that discrimination is significant at the $5\%$ level when we compare the French origin man to all the other candidates. This confirm the choice of our reference candidate as the least susceptible of beign discriminated against.
+
+Do this conclusions extend to the second convention? Here we compare $61.4\%$ to $50\%$ because, in the latter case, both candidates receive the same share of callbacks and there is no discrimination. The p-value of the exact binomial test is $7,2\%$ so that the difference is not significant between the French origin candidates at the $5\%$ level. However, there is always a significant discrimination against all the other candidates at the $5\%$ level. The existence of discrimination is confirmed.

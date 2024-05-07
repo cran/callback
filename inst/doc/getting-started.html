@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>callback: getting started</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">callback: getting started</h1>
+
+
+
+<p>We will use the <code>callback</code> package to analyze hiring
+discrimination based on gender and origin in France. The experiment was
+conducted in 2009 for the jobs of software developers (Petit et al.,
+2013). The data is available in the data frame <code>inter1</code>.
+Let’s examine its contents.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(callback)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(inter1)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">str</span>(inter1)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    2480 obs. of  11 variables:</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;  $ offer    : Factor w/ 310 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,..: 1 1 1 1 1 1 1 1 2 2 ...</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt;  $ firstn   : Factor w/ 8 levels &quot;Abdallah&quot;,&quot;Amadou&quot;,..: 7 4 5 6 1 2 3 8 1 2 ...</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;  $ lastn    : Factor w/ 8 levels &quot;Bertrand&quot;,&quot;Diallo&quot;,..: 5 3 4 7 8 2 1 6 8 2 ...</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt;  $ origin   : Factor w/ 4 levels &quot;F&quot;,&quot;M&quot;,&quot;S&quot;,&quot;V&quot;: 1 3 2 4 2 3 1 4 2 3 ...</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt;  $ sentorder: int  3 7 6 2 1 5 4 8 8 4 ...</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt;  $ gender   : Factor w/ 2 levels &quot;Man&quot;,&quot;Woman&quot;: 2 2 2 2 1 1 1 1 1 1 ...</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt;  $ callback : logi  TRUE TRUE TRUE TRUE FALSE FALSE ...</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;  $ paris    : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt;  $ cont     : Factor w/ 2 levels &quot;LTC&quot;,&quot;STC&quot;: 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt;  $ ansorder : int  1 2 3 4 9 9 9 9 9 9 ...</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt;  $ date     : Factor w/ 3 levels &quot;April 2009&quot;,&quot;February 2009&quot;,..: 2 2 2 2 2 2 2 2 2 2 ...</span></span></code></pre></div>
+<p>The first variable <code>offer</code> is very important. It indicates
+the job offer identification. It is important because, in order to test
+discrimination, the workers must candidate on the same job offer. This
+is the <code>cluster</code> parameter of the <code>callback()</code>
+function. With <code>cluster=&quot;offer&quot;</code> we are sure that all the
+computations will be paired, which means that we will always compare the
+candidates on the very same job offer. This is essential to produce
+meaningful results since otherwise the difference of answers could come
+from the differences of recruiters and not from the differences in
+gender or origin.</p>
+<p>The second important variables are the one that define the
+candidates. Here, there are two variables : gender and origin. These are
+factors and the reference levels of these factors define a reference
+candidate. Which one? By convention, it is the candidate that is the
+least susceptible of being discriminated against. Here, the reference
+candidate would be male because male candidates should not be
+discriminated against because of their gender, and from a French origin
+because French origin candidates should not be discriminated against in
+the French labour market because they have a French origin. In practice,
+we wil check that this candidate really had the highest callback rate.
+We can find the reference levels of our two factors by looking at the
+first level given by the <code>levels()</code> function.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">levels</span>(inter1<span class="sc">$</span>gender)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Man&quot;   &quot;Woman&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">levels</span>(inter1<span class="sc">$</span>origin)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;F&quot; &quot;M&quot; &quot;S&quot; &quot;V&quot;</span></span></code></pre></div>
+<p>There are two genders : “Man” (reference) and “Woman”. There are four
+origins : French (F, reference), Moroccan (M), Senegalese (S) and
+Vietnamese (V). You do not need to aggregate the two candidates’
+variables gender and origin to use <code>callback()</code>, it will do
+it for you.</p>
+<p>The last element we need is, obviously, the outcome of the job hiring
+application. It is given by the <code>callback</code> variable. It is a
+Boolean variable, TRUE when the recruiter gives a non negative callback,
+and FALSE otherwise.</p>
+<p>We can know launch the <code>callback()</code> function, which
+prepares the data for statistical analysis. Here we need to choose the
+<code>comp</code> parameter. Indeed, we realize that there are 8
+candidates so that <span class="math inline">\(8\times 7/2=28\)</span>
+possible comparisons are possible. This is a large number and this is
+why <code>callback()</code> performs the statistical analysis according
+to the reference candidate by default with <code>comp=&quot;ref&quot;</code>. This
+reduces our analysis to 7 comparisons. You can get the 28 comparisons by
+choosing <code>comp=&quot;all&quot;</code> instead.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">callback</span>(<span class="at">data =</span> inter1, <span class="at">cluster =</span> <span class="st">&quot;offer&quot;</span>, <span class="at">candid =</span> <span class="fu">c</span>(<span class="st">&quot;gender&quot;</span>,<span class="st">&quot;origin&quot;</span>), <span class="at">callback =</span> <span class="st">&quot;callback&quot;</span>)</span></code></pre></div>
+<p>The m object contains for formatted data needed for the analysis.
+Using ‘print()’ gives the mains characteristics of the experiment :</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">print</span>(m)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt;  Structure of the experiment </span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;  ---------------------------</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;  Candidates defined by: gender origin </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;  Callback variable: callback </span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  Number of tests for each candidate:</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;   Man.F Woman.F   Man.M Woman.M   Man.S Woman.S   Man.V Woman.V </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     310     310     310     310     310     310     310     310 </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;  Number of tests for each pair of candidates:</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt;  Man.F.vs.Woman.F Man.F.vs.Man.M Man.F.vs.Woman.M Man.F.vs.Man.S</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt;               310            310              310            310</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;  Man.F.vs.Woman.S Man.F.vs.Man.V Man.F.vs.Woman.V</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;               310            310              310</span></span></code></pre></div>
+<p>We find that the experiment is standard, in the sense that all the
+candidates were sent to all the applications. Notice that this is not
+needed to use <code>callback</code>.</p>
+<p>In order to get the result of the discrimination tests, we will use
+the ‘stat_count’ function. It can be saved into an object for further
+exports, or printed. The following instruction:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">stat_count</span>(m)</span></code></pre></div>
+<p>does not produce any printed output, by saves an object
+<code>stat_count</code> into <code>s</code>. We can get the statistics
+with:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">print</span>(s)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt;  Callback counts:</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;  ----------------</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt;                  tests callback callback1 callback2 Neither Only 1 Only 2 Both</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F   310      113        86        70     197     43     27   43</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M     310      106        86        65     204     41     20   45</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M   310       96        86        32     214     64     10   22</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S     310      100        86        43     210     57     14   29</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S   310       97        86        26     213     71     11   15</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V     310       97        86        38     213     59     11   27</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V   310      111        86        62     199     49     25   37</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;                  Difference</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F         16</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M           21</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M         54</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S           43</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S         60</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V           48</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V         24</span></span></code></pre></div>
+<p>The callback counts describe the results of the paired experiments.
+The first column defines the comparison under the form “candidate 1 vs
+candidate 2”. Here “Man.F vs Woman.F” means that we compare French
+origin men and women. Out of <span class="math inline">\(310\)</span>
+tests, <span class="math inline">\(113\)</span> got at least one
+callback. The men got <span class="math inline">\(86\)</span> callbacks
+and the women <span class="math inline">\(70\)</span>. The difference,
+called net discrimination, equals <span class="math inline">\(16\)</span> callbacks. We can go further in the
+details thanks to the next block. Out of <span class="math inline">\(310\)</span> tests, neither candidate was called
+back in <span class="math inline">\(197\)</span> of the job offers,
+<span class="math inline">\(43\)</span> called only men, <span class="math inline">\(27\)</span> called only women and <span class="math inline">\(43\)</span> called both. Discrimination only
+occurs when a single candidate is called back. The net discrimination is
+thus <span class="math inline">\(43-27=16\)</span>.</p>
+<p>Now, we can pass to the proportions analysis. We can save hte output
+or print it, like in the previous example. Printing is the default.
+There are two ways to compute proportions in discrimination studies.
+First, you can divide the number of callbacks by the number of tests.
+Second, you can restrict your analysis to the tests where only one
+candidate has been called back, and give his share of the callbacks. We
+start with the first convention.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">stat_prop</span>(m)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt;  Analysis of proportions - fractions of tests:</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt;  --------------------------------------------- </span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;  At least one callback:</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;                  tests L95_p_callback p_callback U95_p_callback</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F   310          0.311      0.365          0.421</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M     310          0.289      0.342          0.398</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M   310          0.259      0.310          0.364</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S     310          0.271      0.323          0.378</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S   310          0.262      0.313          0.368</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V     310          0.262      0.313          0.368</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V   310          0.305      0.358          0.414</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; (Clopper-Pearson confidence intervals at the  95 % level)</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;  Callback rates of the candidates (cand1 vs cand2): </span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;                  L95_p_cand1 p_cand1 U95_p_cand1 L95_p_cand2 p_cand2</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F       0.228   0.277       0.331      0.1805  0.2258</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M         0.228   0.277       0.331      0.1657  0.2097</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M       0.228   0.277       0.331      0.0717  0.1032</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S         0.228   0.277       0.331      0.1022  0.1387</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S       0.228   0.277       0.331      0.0555  0.0839</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V         0.228   0.277       0.331      0.0882  0.1226</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V       0.228   0.277       0.331      0.1569  0.2000</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt;                  U95_p_cand2</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F       0.276</span></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M         0.259</span></span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M       0.143</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S         0.182</span></span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S       0.120</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V         0.164</span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V       0.249</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt; (Clopper-Pearson confidence intervals at the  95 % level)</span></span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt;  Analysis of proportions - fractions of exclusive callbacks:</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt;  -----------------------------------------------------------</span></span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt;  Callback rates of the candidates (cand1 vs cand2): </span></span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a><span class="co">#&gt;                  callback L95_r_cand1 r_cand_1 U95_r_cand1 L95_r_cand2 r_cand_2</span></span>
+<span id="cb7-47"><a href="#cb7-47" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F      113       0.490    0.614       0.728      0.2717    0.386</span></span>
+<span id="cb7-48"><a href="#cb7-48" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M        106       0.540    0.672       0.787      0.2131    0.328</span></span>
+<span id="cb7-49"><a href="#cb7-49" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M       96       0.765    0.865       0.933      0.0668    0.135</span></span>
+<span id="cb7-50"><a href="#cb7-50" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S        100       0.691    0.803       0.888      0.1122    0.197</span></span>
+<span id="cb7-51"><a href="#cb7-51" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S       97       0.773    0.866       0.931      0.0689    0.134</span></span>
+<span id="cb7-52"><a href="#cb7-52" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V         97       0.736    0.843       0.919      0.0811    0.157</span></span>
+<span id="cb7-53"><a href="#cb7-53" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V      111       0.543    0.662       0.768      0.2319    0.338</span></span>
+<span id="cb7-54"><a href="#cb7-54" tabindex="-1"></a><span class="co">#&gt;                  U95_r_cand2</span></span>
+<span id="cb7-55"><a href="#cb7-55" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.F       0.510</span></span>
+<span id="cb7-56"><a href="#cb7-56" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.M         0.460</span></span>
+<span id="cb7-57"><a href="#cb7-57" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.M       0.235</span></span>
+<span id="cb7-58"><a href="#cb7-58" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.S         0.309</span></span>
+<span id="cb7-59"><a href="#cb7-59" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.S       0.227</span></span>
+<span id="cb7-60"><a href="#cb7-60" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Man.V         0.264</span></span>
+<span id="cb7-61"><a href="#cb7-61" tabindex="-1"></a><span class="co">#&gt; Man.F.vs.Woman.V       0.457</span></span>
+<span id="cb7-62"><a href="#cb7-62" tabindex="-1"></a><span class="co">#&gt; (Clopper-Pearson confidence intervals at the  95 % level)</span></span></code></pre></div>
+<p>The overall callback rate measures the tension in the labour market:
+the more firms need workers, the higher it is. For software developers,
+we are above <span class="math inline">\(30\%\)</span>, which is a high
+callback rate. The next block give the callback rates of pairs of
+candidates with their confidence interval at the <span class="math inline">\(95\%\)</span> level (you can change it with the
+option “level”). French origin men were called back in <span class="math inline">\(27.7\%\)</span> of the 310 applications (<span class="math inline">\(95\%\)</span> interval: <span class="math inline">\(22.8\%-33.1\%\)</span>), while French origin women
+were called back for <span class="math inline">\(22.6\%\)</span> of the
+tests (<span class="math inline">\(95\%\)</span> interval : <span class="math inline">\(18.1\%-27.6\%\)</span>).</p>
+<p>Let’s apply the second convention. Out of the 310 tests, 113 were
+discriminatory (only one of the two candidates had a callback). French
+origin men got <span class="math inline">\(61,4\%\)</span> of these
+callbacks and the French origin women <span class="math inline">\(1-61,4\%=38,6\%\)</span>. The confidence intervals
+are also provided.</p>
+<p>We may then wonder: are these differences statistically significant?
+We enter:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">stat_comp</span>(m)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt;  Equality of proportions - fractions of tests:</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt;  --------------------------------------------- </span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;                  p_callback1-p_callback2 Student    p-value</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.F                0.051613  1.9206 5.5697e-02</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.M                  0.067742  2.7163 6.9735e-03</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.M                0.174194  6.7081 9.4042e-11</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.S                  0.138710  5.3234 1.9619e-07</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.S                0.193548  7.1401 6.7049e-12</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.V                  0.154839  6.0585 3.9907e-09</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.V                0.077419  2.8211 5.0960e-03</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; (Asymptotic Student tests)</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;  Equality of proportions - fractions of exclusive callbacks:</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;  ----------------------------------------------------------- </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;                  r_cand1 r_cand1-0.5    p-value</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.F 0.61429     0.11429 7.2238e-02</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.M   0.67213     0.17213 9.8534e-03</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.M 0.86486     0.36486 8.9574e-11</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.S   0.80282     0.30282 2.6659e-07</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.S 0.86585     0.36585 6.8138e-12</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; Man.F vs Man.V   0.84286     0.34286 4.4662e-09</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; Man.F vs Woman.V 0.66216     0.16216 7.0843e-03</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; (Exact binomial tests)</span></span></code></pre></div>
+<p>Considering the first convention, we give the Student test of
+proportions equality. In our example, we compare <span class="math inline">\(27.7\%\)</span> with <span class="math inline">\(22.6\%\)</span>. The Student statistic is <span class="math inline">\(1.92\)</span> and its p-value is <span class="math inline">\(5.6\%\)</span> so that the difference is not
+significant at the <span class="math inline">\(5\%\)</span> level. There
+would be no significant discrimination between the French origin
+candidates. However, a rapid look at the other p-values reveals that
+discrimination is significant at the <span class="math inline">\(5\%\)</span> level when we compare the French
+origin man to all the other candidates. This confirm the choice of our
+reference candidate as the least susceptible of beign discriminated
+against.</p>
+<p>Do this conclusions extend to the second convention? Here we compare
+<span class="math inline">\(61.4\%\)</span> to <span class="math inline">\(50\%\)</span> because, in the latter case, both
+candidates receive the same share of callbacks and there is no
+discrimination. The p-value of the exact binomial test is <span class="math inline">\(7,2\%\)</span> so that the difference is not
+significant between the French origin candidates at the <span class="math inline">\(5\%\)</span> level. However, there is always a
+significant discrimination against all the other candidates at the <span class="math inline">\(5\%\)</span> level. The existence of
+discrimination is confirmed.</p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
