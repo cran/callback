@@ -9,39 +9,64 @@ callback(data, cluster, candid, callback, comp = "ref")
 \arguments{
 \item{data}{A data frame.}
 
-\item{cluster}{A variable name, identifying the test (e.g. a job offer number).}
+\item{cluster}{A variable name, identifying the test (e.g., a job offer number).}
 
 \item{candid}{A list of factor names defining the candidates (e.g., gender, origin).}
 
 \item{callback}{A Boolean variable, equal to TRUE for non negative callbacks.}
 
-\item{comp}{An option, equal to "all" or "ref" (the default). "ref" give the comparisons with the reference candidate, and "all" the pairwise comparisons.}
+\item{comp}{An option, equal to "all" or "ref" (the default). "ref" give the comparisons
+with the reference candidate, and "all" the pairwise comparisons.}
 }
 \value{
-A 'callback' object containing the formatted data sets (\code{fds}), the list of the paired formatted data sets (\code{pfds}), the list of the clusters retained in the paired formatted data sets (\code{cfds}), the names of the candidate variables (\code{candid}) and the name of the callback variable (\code{callback}).
+A 'callback' object containing the formatted data set (\code{fds}), the
+averaged formatted data set (\code{afds}, for multiple tests), the list of the
+paired formatted data sets (\code{pfds}), the offer-level formatted data set
+(\code{ofds}), the names of the candidate variables (\code{candid}) and the
+name of the callback variable (\code{callback}).
+
 \code{fds} contains the following variables:
-\tabular{ll}{
-\code{cluster} \tab the cluster variable.\cr
-\code{candid}\tab the concatenation of the candidate variables.\cr
-\code{callback}\tab the callback variables.\cr
+\itemize{
+\item \bold{cluster:} the cluster variable.
+\item \bold{candid:} the concatenation of the candidate variables.
+\item \bold{callback:} the callback variable.
 }
+
+\code{afds} contains the following variables:
+\itemize{
+\item \bold{cluster:} the cluster variable.
+\item \bold{candid:} the concatenation of the candidate variables.
+\item \bold{callback:} the aggregated callback dummy.
+}
+
 \code{pfds} data frames containing the following variables:
-\tabular{ll}{
-\code{callback1}\tab TRUE if candidate 1 had a callback.\cr
-\code{callback2}\tab TRUE if candidate 2 had a callback.\cr
-\code{c00}\tab TRUE if neither candidate was called back.\cr
-\code{c10}\tab TRUE if candidate 1 was the only one called back.\cr
-\code{c01}\tab TRUE if candidate 2 was the only one called back.\cr
-\code{c11}\tab TRUE if both candidates were called back.\cr
-\code{callback}\tab TRUE if either candidate was called back.\cr
-\code{calldif}\tab callback difference (\code{callback1-callback2}).\cr
+\itemize{
+\item \bold{callback1:} TRUE if candidate 1 had a callback.
+\item \bold{callback2:} TRUE if candidate 2 had a callback.
+\item \bold{c00:} TRUE if neither candidate was called back.
+\item \bold{c10:} TRUE if candidate 1 was the only one called back.
+\item \bold{c01:} TRUE if candidate 2 was the only one called back.
+\item \bold{c11:} TRUE if both candidates were called back.
+\item \bold{callback:} TRUE if either candidate was called back.
+\item \bold{calldif:} callback difference.
 }
-\code{cfds} data frames containing the \code{cluster} variable.
+
+\code{ofds} contains variables corresponding to the candidates' codes and the
+following variables:
+\itemize{
+\item \bold{cluster:} the cluster variable.
+\item \bold{ncall:} the number of callback for the current offer.
+}
 }
 \description{
 Creates the data set used in the callback package.
 }
 \examples{
 data(inter1)
-callback(data=inter1,cluster="offer",candid=c("gender","origin"), callback="callback",comp = "ref")
+m <- callback(data=subset(origin1,reput=="U"),cluster="offer",candid="origin",
+     callback="callback",comp = "ref")
+str(m)
+}
+\author{
+Emmanuel Duguet
 }
